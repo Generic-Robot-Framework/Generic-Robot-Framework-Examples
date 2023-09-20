@@ -4,7 +4,6 @@ use client_example::msg::example_message::Position2DMessage;
 
 use generic_robot_framework::main_loop;
 use generic_robot_framework::models::tnode::Node;
-use generic_robot_framework::models::tpub::Publisher;
 use generic_robot_framework::models::tsub::Subscriber;
 
 fn main() {
@@ -12,7 +11,7 @@ fn main() {
     let atomic_data = Arc::new(Mutex::new(0));
 
     // Creating and registering the Node
-    let node = Node::register("my_node", 1000);
+    let node = Node::register("my_client_node", 1000);
 
     // Creating a Subscriber
     let _subscriber: Subscriber<Position2DMessage, Arc<Mutex<u64>>> = Subscriber::new(
@@ -20,18 +19,6 @@ fn main() {
         test_handle,
         Some(Arc::clone(&atomic_data))
     );
-
-    // Creating a Publisher
-    let publisher: Publisher<Position2DMessage> = Publisher::new("my_new_topic");
-
-    // Creating a Position2DMessage
-    let message = Position2DMessage {
-        x: 1,
-        y: 2
-    };
-
-    // Publishing the message
-    publisher.publish(message);
 
     // Main application loop, checks if the node is Ok
     main_loop!(node, {
@@ -46,7 +33,7 @@ fn main() {
 // Called when a new message is received
 fn test_handle(message: Position2DMessage, atomic_data: Option<Arc<Mutex<u64>>>) {
     // Print the received message
-    println!("{}", message);
+    println!("Received:\n{}", message);
 
     // Getting the atomic data mutex
     let arc = atomic_data.unwrap();
